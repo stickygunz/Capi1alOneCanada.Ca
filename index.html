@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In - Capital One</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    }
+
+    body {
+      background-color: #f5f5f5;
+      min-height: 100vh;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: white;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .loading-screen.active {
+      display: flex;
+    }
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #0066cc;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      color: #666;
+      font-size: 16px;
+    }
+
+    .co-logo-img {
+      height: 32px;
+    }
+
+    .icon {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      position: relative;
+    }
+
+    .icon-download {
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 10px solid #0066cc;
+      margin-top: 5px;
+    }
+
+    .icon-download::after {
+      content: '';
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 8px;
+      background: #0066cc;
+    }
+
+    .icon-doc {
+      width: 16px;
+      height: 20px;
+      border: 2px solid #0066cc;
+      border-radius: 2px;
+      position: relative;
+    }
+
+    .icon-doc::before {
+      content: '';
+      position: absolute;
+      top: 4px;
+      left: 3px;
+      width: 8px;
+      height: 2px;
+      background: #0066cc;
+      box-shadow: 0 4px 0 0 #0066cc, 0 8px 0 0 #0066cc;
+    }
+
+    .icon-print {
+      width: 20px;
+      height: 16px;
+      border: 2px solid #0066cc;
+      border-radius: 2px;
+      position: relative;
+      margin-top: 4px;
+    }
+
+    .icon-print::before {
+      content: '';
+      position: absolute;
+      top: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 12px;
+      height: 4px;
+      border: 2px solid #0066cc;
+      border-bottom: none;
+      border-radius: 2px 2px 0 0;
+    }
+
+    .icon-print::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 14px;
+      height: 4px;
+      border: 2px solid #0066cc;
+      border-top: none;
+      border-radius: 0 0 2px 2px;
+    }
+
+    .icon-arrow-down {
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 8px solid #0066cc;
+    }
+
+    .icon-back {
+      width: 10px;
+      height: 10px;
+      border-left: 3px solid #0066cc;
+      border-bottom: 3px solid #0066cc;
+      transform: rotate(45deg);
+    }
+
+    .login-header-top {
+      background: white;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #0066cc;
+      font-size: 14px;
+    }
+
+    .login-container {
+      max-width: 420px;
+      margin: 60px auto;
+      padding: 0 24px;
+    }
+
+    .login-logo-center {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .login-title {
+      text-align: center;
+      font-size: 28px;
+      color: #333;
+      margin-bottom: 32px;
+      font-weight: 400;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+      font-size: 16px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      background: white;
+    }
+
+    .input-icon {
+      padding: 12px 16px;
+      color: #666;
+      font-size: 20px;
+    }
+
+    .form-group input {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      font-size: 16px;
+      outline: none;
+      background: transparent;
+    }
+
+    .eye-icon {
+      padding: 12px 16px;
+      color: #666;
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .remember-me input {
+      width: 20px;
+      height: 20px;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 16px;
+      background: #0066cc;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 24px;
+    }
+
+    .login-link {
+      color: #0066cc;
+      text-decoration: none;
+      font-size: 16px;
+      display: block;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .costco-notice {
+      margin-top: 40px;
+      padding: 16px;
+      background: #f5f5f5;
+      border-radius: 4px;
+      font-size: 14px;
+      color: #333;
+      text-align: center;
+      border: 1px solid #e0e0e0;
+    }
+
+    .costco-notice a {
+      color: #0066cc;
+    }
+
+    .app-header {
+      background: white;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      background: #ccc;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .greeting {
+      text-align: center;
+      padding: 24px;
+      font-size: 24px;
+      color: #333;
+      background: #f5f5f5;
+    }
+
+    .card-container {
+      background: linear-gradient(135deg, #8b6b29 0%, #6b4f1f 100%);
+      padding: 24px;
+      color: white;
+      margin: 0 16px 16px;
+      border-radius: 8px;
+    }
+
+    .card-label {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-bottom: 4px;
+    }
+
+    .card-value {
+      font-size: 48px;
+      font-weight: 300;
+      margin-bottom: 24px;
+    }
+
+    .card-value sup {
+      font-size: 24px;
+    }
+
+    .card-info-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+
+    .card-info-label {
+      opacity: 0.8;
+    }
+
+    .nav-menu {
+      display: flex;
+      justify-content: space-around;
+      padding: 24px;
+      background: white;
+      margin: 0 16px 16px;
+      border-radius: 8px;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      color: #0066cc;
+      text-decoration: none;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .nav-icon-box {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #0066cc;
+      border-radius: 8px;
+      font-size: 20px;
+      color: #0066cc;
+    }
+
+    .section-box {
+      background: white;
+      margin: 0 16px 16px;
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .section-header {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .transaction-date-header {
+      background: #6b7880;
+      color: white;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .transaction-item {
+      padding: 16px;
+      border-bottom: 1px solid #e0e0e0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .transaction-left {
+      flex: 1;
+      display: flex;
+      gap: 12px;
+    }
+
+    .transaction-icon {
+      width: 40px;
+      height: 40px;
+      background: #e8e8e8;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 14px;
+      color: #555;
+      font-weight: 600;
+    }
+
+    .transaction-details h3 {
+      font-size: 16px;
+      color: #1a1a1a;
+      font-weight: 600;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+
+    .transaction-details p {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .transaction-right {
+      text-align: right;
+    }
+
+    .transaction-amount {
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 4px;
+      color: #1a1a1a;
+    }
+
+    .transaction-meta {
+      font-size: 14px;
+      color: #6b7a8f;
+      margin-bottom: 2px;
+    }
+
+    .view-account-btn {
+      width: 100%;
+      padding: 12px;
+      background: transparent;
+      border: 2px solid white;
+      color: white;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 16px;
+    }
+
+    .back-button {
+      color: #0066cc;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .profile-header {
+      background: #0066cc;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .profile-header h1 {
+      color: white;
+      font-size: 24px;
+      font-weight: 400;
+    }
+
+    .profile-section {
+      background: white;
+      margin: 16px;
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-section-title {
+      font-size: 20px;
+      color: #333;
+      margin-bottom: 20px;
+      font-weight: 400;
+    }
+
+    .profile-item-label {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    .profile-item-value {
+      font-size: 16px;
+      color: #333;
+      word-break: break-word;
+    }
+
+    .edit-icon {
+      float: right;
+      color: #0066cc;
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    .add-link {
+      color: #0066cc;
+      text-decoration: none;
+      font-size: 16px;
+      display: inline-block;
+      margin-top: 12px;
+    }
+
+    .star-icon {
+      display: inline-block;
+      margin-left: 8px;
+      color: #333;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: 40px;
+      right: 0;
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      display: none;
+      z-index: 1000;
+    }
+
+    .dropdown-menu.active {
+      display: block;
+    }
+
+    .dropdown-item {
+      padding: 12px 24px;
+      color: #333;
+      text-decoration: none;
+      display: block;
+      border-bottom: 1px solid #e0e0e0;
+      font-size: 14px;
+    }
+
+    .dropdown-item:last-child {
+      border-bottom: none;
+    }
+
+    .dropdown-item:hover {
+      background: #f5f5f5;
+    }
+
+    .footer-links {
+      background: white;
+      padding: 16px 24px;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    .footer-links a {
+      color: #333;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      margin-right: 24px;
+    }
+
+    .load-more {
+      text-align: center;
+      padding: 24px;
+      color: #0066cc;
+      cursor: pointer;
+      text-decoration: underline;
+      font-weight: 500;
+      background: white;
+      margin: 0 16px;
+      border-radius: 8px;
+      margin-top: 16px;
+    }
+
+    .load-more.hidden {
+      display: none;
+    }
+
+    .previous-transactions {
+      display: none;
+    }
+
+    .previous-transactions.show {
+      display: block;
+    }
+
+    .statement-section {
+      margin-top: 16px;
+    }
+
+    .statement-header {
+      background: #f5f5f5;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .statement-header span {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .action-icons {
+      display: flex;
+      gap: 16px;
+    }
+
+    @media (max-width: 768px) {
+      .app-header, .profile-header {
+        padding: 16px;
+      }
+      .profile-section {
+        margin: 16px 0;
+        border-radius: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="loading-screen" class="loading-screen">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Signing In...</div>
+  </div>
+
+  <div id="login-page" class="page active">
+    <div class="login-header-top">
+      <img src="logo.png" class="co-logo-img" alt="Capital One">
+      <div class="header-right">
+        <span>English</span>
+        <span class="icon icon-arrow-down" style="border-top-color: #0066cc; margin-left: 4px;"></span>
+      </div>
+    </div>
+
+    <div class="login-container">
+      <div class="login-logo-center">
+        <img src="logo.png" style="height: 60px;" alt="Capital One">
+      </div>
+      
+      <h1 class="login-title">Sign In</h1>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label>Username</label>
+          <div class="input-wrapper">
+            <div class="input-icon">👤</div>
+            <input type="text" placeholder="">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-wrapper">
+            <div class="input-icon">🔒</div>
+            <input type="password" placeholder="">
+            <div class="eye-icon">👁</div>
+          </div>
+        </div>
+
+        <div class="remember-me">
+          <input type="checkbox" id="remember">
+          <label for="remember">Remember Me</label>
+        </div>
+
+        <button type="submit" class="btn-primary">Sign in</button>
+
+        <a href="#" class="login-link">Forgot Username or Password?</a>
+        <a href="#" class="login-link">Set Up Online Access</a>
+      </form>
+
+      <div class="costco-notice">
+        Online access for Costco cards is no longer available as of March 4, 2022.<br>
+        <a href="#">Get Details</a>
+      </div>
+    </div>
+  </div> 
+ <div id="dashboard-page" class="page">
+    <div class="app-header">
+      <img src="logo.png" class="co-logo-img" alt="Capital One">
+      <div class="user-menu">
+        <div class="user-avatar" onclick="toggleDropdown()">👤</div>
+        <div id="dropdown-menu" class="dropdown-menu">
+          <a href="#" class="dropdown-item" onclick="showLoading('profile-page', 5000); return false;">Profile</a>
+          <a href="#" class="dropdown-item">Security</a>
+          <a href="#" class="dropdown-item">Account & feature settings</a>
+          <a href="#" class="dropdown-item">Alerts</a>
+          <a href="#" class="dropdown-item">Sign out</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="greeting">Good Afternoon</div>
+
+    <div class="card-container">
+      <div class="card-label">CURRENT BALANCE</div>
+      <div class="card-value">-$86<sup>71</sup></div>
+      
+      <div class="card-info-row">
+        <span class="card-info-label">AVAILABLE CREDIT</span>
+        <span>$386.71</span>
+      </div>
+      <div class="card-info-row">
+        <span class="card-info-label">CURRENT AMOUNT DUE</span>
+        <span>$0.00</span>
+      </div>
+      <div class="card-info-row">
+        <span class="card-info-label">PAYMENT DUE DATE</span>
+        <span>NOV 9</span>
+      </div>
+      <div class="card-info-row">
+        <span class="card-info-label">LAST STATEMENT</span>
+        <span>$337.79</span>
+      </div>
+      <div class="card-info-row">
+        <span class="card-info-label">CREDIT LIMIT</span>
+        <span>$300.00</span>
+      </div>
+
+      <button class="view-account-btn" onclick="showLoading('account-page', 3000)">View Account</button>
+    </div>
+
+    <div class="section-box">
+      <div class="section-header">Recent Transactions</div>
+      
+      <div class="transaction-date-header">Nov 3</div>
+      <div class="transaction-item">
+        <div class="transaction-left">
+          <div class="transaction-icon">IN</div>
+          <div class="transaction-details">
+            <h3>AMAZON CANADA</h3>
+            <p>Internet</p>
+          </div>
+        </div>
+        <div class="transaction-right">
+          <div class="transaction-amount negative">-$30.50</div>
+          <div class="transaction-meta">Jesse C.</div>
+          <div class="transaction-meta">...8422</div>
+        </div>
+      </div>
+
+      <div class="transaction-item">
+        <div class="transaction-left">
+          <div class="transaction-icon">SH</div>
+          <div class="transaction-details">
+            <h3>LOVEGOBUYONLYPAY</h3>
+            <p>Merchandise</p>
+          </div>
+        </div>
+        <div class="transaction-right">
+          <div class="transaction-amount negative">-$1,775.00</div>
+          <div class="transaction-meta">Jesse C.</div>
+          <div class="transaction-meta">...8422</div>
+        </div>
+      </div>
+
+      <div class="transaction-date-header">Nov 2</div>
+      <div class="transaction-item">
+        <div class="transaction-left">
+          <div class="transaction-icon">SH</div>
+          <div class="transaction-details">
+            <h3>LOVEGOBUYONLYPAY</h3>
+            <p>Merchandise</p>
+          </div>
+        </div>
+        <div class="transaction-right">
+          <div class="transaction-amount negative">-$1,305.00</div>
+          <div class="transaction-meta">Jesse C.</div>
+          <div class="transaction-meta">...8422</div>
+        </div>
+      </div>
+
+      <div class="transaction-item">
+        <div class="transaction-left">
+          <div class="transaction-icon">PD</div>
+          <div class="transaction-details">
+            <h3>MOBILE BANK TRANSFER</h3>
+            <p>Payment</p>
+          </div>
+        </div>
+        <div class="transaction-right">
+          <div class="transaction-amount positive">+$540.00</div>
+          <div class="transaction-meta">Jesse C.</div>
+          <div class="transaction-meta">...8422</div>
+        </div>
+      </div>
+
+      <div class="transaction-date-header">Oct 29</div>
+      <div class="transaction-item">
+        <div class="transaction-left">
+          <div class="transaction-icon">SH</div>
+          <div class="transaction-details">
+            <h3>LOVEGOBUYONLYPAY</h3>
+            <p>Merchandise</p>
+          </div>
+        </div>
+        <div class="transaction-right">
+          <div class="transaction-amount negative">-$1,205.00</div>
+          <div class="transaction-meta">Jesse C.</div>
+          <div class="transaction-meta">...8422</div>
+        </div>
+      </div>
+
+      <div class="transaction-item">
+        <div class="transaction-left">
+          <div class="transaction-icon">SH</div>
+          <div class="transaction-details">
+            <h3>LOVEGOBUYONLYPAY</h3>
+            <p>Merchandise</p>
+          </div>
+        </div>
+        <div class="transaction-right">
+          <div class="transaction-amount negative">-$1,200.00</div>
+          <div class="transaction-meta">Jesse C.</div>
+          <div class="transaction-meta">...8422</div>
+        </div>
+      </div>
+
+      <div class="transaction-date-header">Oct 28</div>
+      <div class="transaction-item" style="border-bottom: none;">
+        <div class="transaction-left">
+          <div class="transaction-icon">PD</div>
+          <div class="transaction-details">
+            <h3>BANK TRANSFER DEPOSIT</h3>
+            <p>Payment</p>
+          </div>
+        </div>
+        <div class="transaction-right">
+          <div class="transaction-amount positive">+$5,400.00</div>
+          <div class="transaction-meta">Jesse C.</div>
+          <div class="transaction-meta">...8422</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="account-page" class="page">
+    <div class="app-header">
+      <div class="back-button" onclick="showPage('dashboard-page')">
+        <div class="icon-back"></div>
+        <span>Back</span>
+      </div>
+      <img src="logo.png" class="co-logo-img" alt="Capital One">
+      <div class="user-menu">
+        <div class="user-avatar">👤</div>
+      </div>
+    </div>
+
+    <div style="text-align: center; padding: 24px; background: #f5f5f5;">
+      <h2>Gold Mastercard</h2>
+      <div style="color: #666; margin-top: 8px;">...8422</div>
+    </div>
+
+    <div class="card-container">
+      <div class="card-label">CURRENT BALANCE</div>
+      <div class="card-value">-$86<sup>71</sup></div>
+      
+      <div class="card-info-row">
+        <span class="card-info-label">AVAILABLE CREDIT</span>
+        <span>$386.71</span>
+      </div>
+      <div class="card-info-row">
+        <span class="card-info-label">CURRENT AMOUNT DUE</span>
+        <span>$0.00</span>
+      </div>
+      <div class="card-info-row">
+        <span class="card-info-label">PAYMENT DUE DATE</span>
+        <span>NOV 9</span>
+      </div>
+      <div class="card-info-row">
+        <span class="card-info-label">LAST STATEMENT</span>
+        <span>$337.79</span>
+      </div>
+      <div class="card-info-row">
+        <span class="card-info-label">CREDIT LIMIT</span>
+        <span>$300.00</span>
+      </div>
+    </div>
+
+    <div class="nav-menu">
+      <div class="nav-item">
+        <div class="nav-icon-box">
+          <div class="icon-doc" style="border-color: #0066cc; transform: scale(0.8);"></div>
+        </div>
+        <span>Statements</span>
+      </div>
+      <div class="nav-item">
+        <div class="nav-icon-box" style="font-size: 24px;">+</div>
+        <span>Services</span>
+      </div>
+    </div>
+
+    <div class="section-box">
+      <div class="section-header">Pending Transactions</div>
+      <div style="text-align: center; padding: 24px; color: #666;">There are no pending transactions.</div>
+    </div>
+
+    <div class="section-box">
+      <div class="section-header">Posted Transactions Since Your Last Statement</div>
+      
+      <div class="transaction-date-header">Nov 3</div>
+      
+      <div class="transaction-item">
+        <div class="transaction-left">
+          <div class="transaction-icon">IN</div>
+          <div class="transaction-details">
+            <h3>AMAZON CANADA</h3>
+            <p>Internet</p>
+          </div>
+        </div>
+        <div class="transaction-right">
+          <div class="transaction-amount negative">-$30.50</div>
+          <div class="transaction-meta">Jesse C.</div>
+          <div class="transaction-meta">...8422</div>
+        </div>
+      </div>
+
+      <div class="transaction-item">
+        <div class="transaction-left">
+          <div class="transaction-icon">SH</div>
+          <div class="transaction-details">
+            <h3>LOVEGOBUYONLYPAY</h3>
+            <p>Merchandise</p>
+          </div>
+        </div>
+        <div class="transaction-right">
+          <div class="transaction-amount negative">-$1,775.00</div>
+          <div class="transaction-meta">Jesse C.</div>
+          <div class="transaction-meta">...8422</div>
+        </div>
+      </div>
+
+      <div class="transaction-date-header">Nov 2</div>
+      
+      <div class="transaction-item">
+        <div class="transaction-left">
+          <div class="transaction-icon">SH</div>
+          <div class="transaction-details">
+            <h3>LOVEGOBUYONLYPAY</h3>
+            <p>Merchandise</p>
+          </div>
+        </div>
+        <div class="transaction-right">
+          <div class="transaction-amount negative">-$1,305.00</div>
+          <div class="transaction-meta">Jesse C.</div>
+          <div class="transaction-meta">...8422</div>
+        </div>
+      </div>
+
+      <div class="transaction-item">
+        <div class="transaction-left">
+          <div class="transaction-icon">PD</div>
+          <div class="transaction-details">
+            <h3>MOBILE BANK TRANSFER</h3>
+            <p>Payment</p>
+          </div>
+        </div>
+        <div class="transaction-right">
+          <div class="transaction-amount positive">+$540.00</div>
+          <div class="transaction-meta">Jesse C.</div>
+          <div class="transaction-meta">...8422</div>
+        </div>
+      </div>
+
+      <div class="transaction-date-header">Oct 29</div>
+      
+      <div class="transaction-item">
+        <div class="transaction-left">
+          <div class="transaction-icon">SH</div>
+          <div class="transaction-details">
+            <h3>LOVEGOBUYONLYPAY</h3>
+            <p>Merchandise</p>
+          </div>
+        </div>
+        <div class="transaction-right">
+          <div class="transaction-amount negative">-$1,205.00</div>
+          <div class="transaction-meta">Jesse C.</div>
+          <div class="transaction-meta">...8422</div>
+        </div>
+      </div>
+
+      <div class="transaction-item">
+        <div class="transaction-left">
+          <div class="transaction-icon">SH</div>
+          <div class="transaction-details">
+            <h3>LOVEGOBUYONLYPAY</h3>
+            <p>Merchandise</p>
+          </div>
+        </div>
+        <div class="transaction-right">
+          <div class="transaction-amount negative">-$1,200.00</div>
+          <div class="transaction-meta">Jesse C.</div>
+          <div class="transaction-meta">...8422</div>
+        </div>
+      </div>
+
+      <div class="transaction-date-header">Oct 28</div>
+      <div class="transaction-item" style="border-bottom: none;">
+        <div class="transaction-left">
+          <div class="transaction-icon">PD</div>
+          <div class="transaction-details">
+            <h3>BANK TRANSFER DEPOSIT</h3>
+            <p>Payment</p>
+          </div>
+        </div>
+        <div class="transaction-right">
+          <div class="transaction-amount positive">+$5,400.00</div>
+          <div class="transaction-meta">Jesse C.</div>
+          <div class="transaction-meta">...8422</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-box statement-section">
+      <div class="statement-header">
+        <span>Statement Ending Nov 9, 2026</span>
+        <div class="action-icons">
+          <div class="icon-download"></div>
+          <div class="icon-doc"></div>
+          <div class="icon-print"></div>
+        </div>
+      </div>
+
+      <div class="load-more" onclick="toggleAndHide()">Load Previous Statement</div>
+
+      <div id="previous-transactions" class="previous-transactions">
+        <div class="transaction-date-header">Oct 13</div>
+        <div class="transaction-item">
+          <div class="transaction-left">
+            <div class="transaction-icon">INT</div>
+            <div class="transaction-details">
+              <h3>INTEREST CHARGES</h3>
+              <p>Interest Charge</p>
+            </div>
+          </div>
+          <div class="transaction-right">
+            <div class="transaction-amount negative">-$8.21</div>
+            <div class="transaction-meta">Jesse C.</div>
+            <div class="transaction-meta">...8422</div>
+          </div>
+        </div>
+
+        <div class="transaction-date-header">Sep 12</div>
+        <div class="transaction-item">
+          <div class="transaction-left">
+            <div class="transaction-icon">INT</div>
+            <div class="transaction-details">
+              <h3>INTEREST CHARGES</h3>
+              <p>Interest Charge</p>
+            </div>
+          </div>
+          <div class="transaction-right">
+            <div class="transaction-amount negative">-$8.01</div>
+            <div class="transaction-meta">Jesse C.</div>
+            <div class="transaction-meta">...8422</div>
+          </div>
+        </div>
+
+        <div class="transaction-date-header">Aug 13</div>
+        <div class="transaction-item">
+          <div class="transaction-left">
+            <div class="transaction-icon">INT</div>
+            <div class="transaction-details">
+              <h3>INTEREST CHARGES</h3>
+              <p>Interest Charge</p>
+            </div>
+          </div>
+          <div class="transaction-right">
+            <div class="transaction-amount negative">-$7.82</div>
+            <div class="transaction-meta">Jesse C.</div>
+            <div class="transaction-meta">...8422</div>
+          </div>
+        </div>
+
+        <div class="transaction-date-header">Jul 13</div>
+        <div class="transaction-item">
+          <div class="transaction-left">
+            <div class="transaction-icon">INT</div>
+            <div class="transaction-details">
+              <h3>INTEREST CHARGES</h3>
+              <p>Interest Charge</p>
+            </div>
+          </div>
+          <div class="transaction-right">
+            <div class="transaction-amount negative">-$7.79</div>
+            <div class="transaction-meta">Jesse C.</div>
+            <div class="transaction-meta">...8422</div>
+          </div>
+        </div>
+
+        <div class="transaction-date-header">Jun 13</div>
+        <div class="transaction-item">
+          <div class="transaction-left">
+            <div class="transaction-icon">INT</div>
+            <div class="transaction-details">
+              <h3>INTEREST CHARGES</h3>
+              <p>Interest Charge</p>
+            </div>
+          </div>
+          <div class="transaction-right">
+            <div class="transaction-amount negative">-$9.72</div>
+            <div class="transaction-meta">Jesse C.</div>
+            <div class="transaction-meta">...8422</div>
+          </div>
+        </div>
+
+        <div class="transaction-date-header">May 14</div>
+        <div class="transaction-item">
+          <div class="transaction-left">
+            <div class="transaction-icon">HC</div>
+            <div class="transaction-details">
+              <h3>THE FARMHOUSE CANNABIS</h3>
+              <p>Healthcare</p>
+            </div>
+          </div>
+          <div class="transaction-right">
+            <div class="transaction-amount negative">-$1.12</div>
+            <div class="transaction-meta">Jesse C.</div>
+            <div class="transaction-meta">...8422</div>
+          </div>
+        </div>
+
+        <div class="transaction-item">
+          <div class="transaction-left">
+            <div class="transaction-icon">HC</div>
+            <div class="transaction-details">
+              <h3>THE FARMHOUSE CANNABIS</h3>
+              <p>Healthcare</p>
+            </div>
+          </div>
+          <div class="transaction-right">
+            <div class="transaction-amount negative">-$6.05</div>
+            <div class="transaction-meta">Jesse C.</div>
+            <div class="transaction-meta">...8422</div>
+          </div>
+        </div>
+
+        <div class="transaction-date-header">May 09</div>
+        <div class="transaction-item">
+          <div class="transaction-left">
+            <div class="transaction-icon">GA</div>
+            <div class="transaction-details">
+              <h3>AIR-SERV V AN04251</h3>
+              <p>Gas/Automotive</p>
+            </div>
+          </div>
+          <div class="transaction-right">
+            <div class="transaction-amount negative">-$3.00</div>
+            <div class="transaction-meta">Jesse C.</div>
+            <div class="transaction-meta">...8422</div>
+          </div>
+        </div>
+
+        <div class="transaction-date-header">May 08</div>
+        <div class="transaction-item">
+          <div class="transaction-left">
+            <div class="transaction-icon">DN</div>
+            <div class="transaction-details">
+              <h3>TIM HORTONS</h3>
+              <p>Dining</p>
+            </div>
+          </div>
+          <div class="transaction-right">
+            <div class="transaction-amount negative">-$2.61</div>
+            <div class="transaction-meta">Jesse C.</div>
+            <div class="transaction-meta">...8422</div>
+          </div>
+        </div>
+
+        <div class="transaction-item">
+          <div class="transaction-left">
+            <div class="transaction-icon">DN</div>
+            <div class="transaction-details">
+              <h3>CAD SODA SNACK VENDING</h3>
+              <p>Dining</p>
+            </div>
+          </div>
+          <div class="transaction-right">
+            <div class="transaction-amount negative">-$3.25</div>
+            <div class="transaction-meta">Jesse C.</div>
+            <div class="transaction-meta">...8422</div>
+          </div>
+        </div>
+
+        <div class="transaction-item">
+          <div class="transaction-left">
+            <div class="transaction-icon">GA</div>
+            <div class="transaction-details">
+              <h3>PETRO-CANADA</h3>
+              <p>Gas/Automotive</p>
+            </div>
+          </div>
+          <div class="transaction-right">
+            <div class="transaction-amount negative">-$20.00</div>
+            <div class="transaction-meta">Jesse C.</div>
+            <div class="transaction-meta">...8422</div>
+          </div>
+        </div>
+
+        <div class="transaction-date-header">May 07</div>
+        <div class="transaction-item">
+          <div class="transaction-left">
+            <div class="transaction-icon">DN</div>
+            <div class="transaction-details">
+              <h3>TIM HORTONS</h3>
+              <p>Dining</p>
+            </div>
+          </div>
+          <div class="transaction-right">
+            <div class="transaction-amount negative">-$2.61</div>
+            <div class="transaction-meta">Jesse C.</div>
+            <div class="transaction-meta">...8422</div>
+          </div>
+        </div>
+
+        <div class="transaction-item">
+          <div class="transaction-left">
+            <div class="transaction-icon">IN</div>
+            <div class="transaction-details">
+              <h3>AMAZON CANADA</h3>
+              <p>Internet</p>
+            </div>
+          </div>
+          <div class="transaction-right">
+            <div class="transaction-amount negative">-$35.01</div>
+            <div class="transaction-meta">Jesse C.</div>
+            <div class="transaction-meta">...8422</div>
+          </div>
+        </div>
+
+        <div class="transaction-item">
+          <div class="transaction-left">
+            <div class="transaction-icon">MC</div>
+            <div class="transaction-details">
+              <h3>BELL CANADA</h3>
+              <p>Merchandise</p>
+            </div>
+          </div>
+          <div class="transaction-right">
+            <div class="transaction-amount negative">-$35.00</div>
+            <div class="transaction-meta">Jesse C.</div>
+            <div class="transaction-meta">...8422</div>
+          </div>
+        </div>
+
+        <div class="transaction-date-header">May 06</div>
+        <div class="transaction-item">
+          <div class="transaction-left">
+            <div class="transaction-icon">GR</div>
+            <div class="transaction-details">
+              <h3>FOOD BASICS</h3>
+              <p>Grocery</p>
+            </div>
+          </div>
+          <div class="transaction-right">
+            <div class="transaction-amount negative">-$19.51</div>
+            <div class="transaction-meta">Jesse C.</div>
+            <div class="transaction-meta">...8422</div>
+          </div>
+        </div>
+
+        <div class="transaction-item">
+          <div class="transaction-left">
+            <div class="transaction-icon">GA</div>
+            <div class="transaction-details">
+              <h3>ESSO</h3>
+              <p>Gas/Automotive</p>
+            </div>
+          </div>
+          <div class="transaction-right">
+            <div class="transaction-amount negative">-$20.00</div>
+            <div class="transaction-meta">Jesse C.</div>
+            <div class="transaction-meta">...8422</div>
+          </div>
+        </div>
+
+        <div class="transaction-date-header">May 05</div>
+        <div class="transaction-item">
+          <div class="transaction-left">
+            <div class="transaction-icon">DN</div>
+            <div class="transaction-details">
+              <h3>MCDONALD'S CANADA</h3>
+              <p>Dining</p>
+            </div>
+          </div>
+          <div class="transaction-right">
+            <div class="transaction-amount negative">-$8.57</div>
+            <div class="transaction-meta">Jesse C.</div>
+            <div class="transaction-meta">...8422</div>
+          </div>
+        </div>
+
+        <div class="transaction-item">
+          <div class="transaction-left">
+            <div class="transaction-icon">DN</div>
+            <div class="transaction-details">
+              <h3>TIM HORTONS</h3>
+              <p>Dining</p>
+            </div>
+          </div>
+          <div class="transaction-right">
+            <div class="transaction-amount negative">-$1.92</div>
+            <div class="transaction-meta">Jesse C.</div>
+            <div class="transaction-meta">...8422</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="footer-links">
+      <a href="#">HOME</a>
+      <a href="#">SUPPORT CENTRE</a>
+      <a href="#">CONTACT US</a>
+      <a href="#">PRIVACY</a>
+      <a href="#">SECURITY</a>
+      <a href="#">LEGAL</a>
+    </div>
+  </div>
+
+  <div id="profile-page" class="page">
+    <div class="profile-header">
+      <div class="back-button" onclick="showPage('dashboard-page')">
+        <div class="icon-back"></div>
+      </div>
+      <h1>Profile</h1>
+      <div style="width: 24px;"></div>
+    </div>
+
+    <div class="profile-section">
+      <div style="display: flex; gap: 24px; align-items: flex-start;">
+        <div style="width: 100px; height: 100px; background: #ccc; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; color: #666;">👤</div>
+        <div style="flex: 1;">
+          <div class="profile-item-label">Greeting name</div>
+          <div class="profile-item-value">Jesse</div>
+        </div>
+        <div class="edit-icon">✏️</div>
+      </div>
+    </div>
+
+    <div class="profile-section">
+      <h2 class="profile-section-title">Addresses</h2>
+      
+      <div class="profile-item">
+        <div class="profile-item-label">Residential address</div>
+        <div class="profile-item-value">371 Bronte St S Unit 86</div>
+        <div class="profile-item-value">Milton, ON L9T 3K5</div>
+        <div class="edit-icon" style="margin-top: -32px;">✏️</div>
+      </div>
+
+      <div class="profile-item">
+        <div class="profile-item-label">Primary mailing address <span class="star-icon">★</span></div>
+        <div class="profile-item-value">371 Bronte St S Unit 86</div>
+        <div class="profile-item-value">Milton, ON L9T 3K5</div>
+        <div style="margin-top: 16px; font-size: 14px; color: #666;">
+          This address is used for the following account(s):<br>
+          Gold Mastercard ...8422: All mail
+        </div>
+        <div class="edit-icon" style="margin-top: -32px;">✏️</div>
+      </div>
+
+      <div style="margin-top: 24px;">
+        <a href="#" class="add-link">Add another mailing address</a>
+        <span style="color: #e0e0e0; margin: 0 12px;">|</span>
+        <a href="#" class="add-link">Manage assigned addresses</a>
+      </div>
+    </div>
+
+    <div class="profile-section">
+      <h2 class="profile-section-title">Phone numbers</h2>
+      
+      <div class="profile-item">
+        <div class="profile-item-value">289-795-7651</div>
+        <div class="profile-item-label" style="margin-top: 8px;">Primary • Text alerts on</div>
+        <div class="edit-icon" style="margin-top: -32px;">✏️</div>
+      </div>
+
+      <a href="#" class="add-link">+ Add another phone number</a>
+    </div>
+
+    <div class="profile-section">
+      <h2 class="profile-section-title">Email</h2>
+      
+      <div class="profile-item">
+        <div class="profile-item-value">cardosoo@live.ca <span class="star-icon">★</span></div>
+        <div class="edit-icon" style="margin-top: -32px;">✏️</div>
+      </div>
+
+      <a href="#" class="add-link">Add Email</a>
+    </div>
+
+    <div class="profile-section">
+      <h2 class="profile-section-title">Employment Info</h2>
+      
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;">
+        <div>
+          <div class="profile-item-label">Employment Status</div>
+          <div class="profile-item-value">Self Employed</div>
+        </div>
+        <div>
+          <div class="profile-item-label">Personal Income</div>
+          <div class="profile-item-value">$40,000.00</div>
+        </div>
+        <div>
+          <div class="profile-item-label">Additional Income</div>
+          <div class="profile-item-value">$5,000.00</div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 24px;">
+        <div>
+          <div class="profile-item-label">Occupation</div>
+          <div class="profile-item-value">Broker</div>
+        </div>
+        <div>
+          <div class="profile-item-label">Industry</div>
+          <div class="profile-item-value">Finance</div>
+        </div>
+        <div>
+          <div class="profile-item-label">Employer Name</div>
+          <div class="profile-item-value">None</div>
+        </div>
+      </div>
+      <div class="edit-icon" style="float: right; margin-top: -60px;">✏️</div>
+    </div>
+
+    <div class="footer-links">
+      <a href="#">HOME</a>
+      <a href="#">SUPPORT CENTRE</a>
+      <a href="#">CONTACT US</a>
+      <a href="#">PRIVACY</a>
+      <a href="#">SECURITY</a>
+      <a href="#">LEGAL</a>
+    </div>
+  </div>
+
+  <script>
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+      });
+      document.getElementById(pageId).classList.add('active');
+    }
+
+    function showLoading(pageId, delay) {
+      const loadingText = document.querySelector('.loading-text');
+      loadingText.textContent = 'Loading...';
+      document.getElementById('loading-screen').classList.add('active');
+      setTimeout(function() {
+        document.getElementById('loading-screen').classList.remove('active');
+        showPage(pageId);
+      }, delay);
+    }
+
+    function toggleDropdown() {
+      const dropdown = document.getElementById('dropdown-menu');
+      dropdown.classList.toggle('active');
+    }
+
+    function toggleAndHide() {
+      const prevSection = document.getElementById('previous-transactions');
+      const loadMoreButton = document.querySelector('.load-more');
+      
+      if (prevSection.classList.contains('show')) {
+        prevSection.classList.remove('show');
+        loadMoreButton.style.display = 'block';
+      } else {
+        prevSection.classList.add('show');
+        loadMoreButton.classList.add('hidden');
+      }
+    }
+
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const loadingText = document.querySelector('.loading-text');
+      loadingText.textContent = 'Signing In...';
+      document.getElementById('loading-screen').classList.add('active');
+      setTimeout(function() {
+        document.getElementById('loading-screen').classList.remove('active');
+        showPage('dashboard-page');
+      }, 5000);
+    });
+
+    document.addEventListener('click', function(event) {
+      const dropdown = document.getElementById('dropdown-menu');
+      if (!event.target.closest('.user-menu')) {
+        dropdown.classList.remove('active');
+      }
+    });
+  </script>
+</body>
+</html>
